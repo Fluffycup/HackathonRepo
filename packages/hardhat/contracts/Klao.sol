@@ -9,6 +9,14 @@ contract ERC20 {
 
     function totalSupply() external view returns (uint);
 
+    function balanceOf(address account) external view returns (uint);
+
+    function transfer(address recepient, uint amount) external returns (bool);
+
+    function allowance(address owner, address spender) external view returns (uint)
+
+    function approve(address spender, )
+
 
   // event SetPurpose(address sender, string purpose);
 
