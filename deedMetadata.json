@@ -1,0 +1,11 @@
+{
+    "attributes": [
+      {
+        "trait_type": "Home",
+        "value": "1234 Main St Denver, CO 80301"
+      }
+    ],
+    "description": "The property at 1234 Main St Denver, CO 80301 stretches from the northeast corner of the 1200 block of Main Street to it's southwest corner.",
+    "image": "https://gateway.pinata.cloud/ipfs/QmXqudrqngqmfm7FVZWf3zCUrKeqHwECxFWEvbL19Sz64K",
+    "name": "Property Deed"
+  }
