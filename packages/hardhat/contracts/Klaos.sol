@@ -28,8 +28,8 @@ contract Klaos is ERC20 {
 
 
 //Foot Note
-/*Not Christian myself but thought it might interest someone in the lore behind the name.
-So here's a quote from verse Matthew 14:19
+/*
+
 
 Matthew 14:19
 "And he directed the people to sit down on the grass.
@@ -38,7 +38,8 @@ he gave thanks and broke the loaves.
 Then he gave them to the disciples, and the disciples gave them to the people."
 
 In the Greek translation the breaking of the bread uses the verb "klao"
-which I personally thought was a good idea for the project as we are distributing
-housing plots into multiple broken pieces.
+meaning to break apart. This meaning was the inspiration for the name of this project
+as it is about breaking plots of land into micro deeds.
+
 
 */
