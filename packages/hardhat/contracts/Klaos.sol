@@ -2,14 +2,12 @@ pragma solidity >=0.8.0 <0.9.0;
 //SPDX-License-Identifier: MIT
 
 import "hardhat/console.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol";
-// import "@openzeppelin/contracts/access/Ownable.sol";
-// https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract Klaos is ERC20 {
-    address public admin;
+  address public admin;
     constructor() ERC20('Klaos' , 'PHI') {
-      _mint(msg.sender, 10000* 10 ** 18);
+      _mint(msg.sender, 10000 * 10 ** 18);
       admin = msg.sender;
     }
 
@@ -22,7 +20,7 @@ contract Klaos is ERC20 {
       _burn(msg.sender,amount);
 
     }
-
+}
 
 
 
