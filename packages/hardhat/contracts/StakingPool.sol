@@ -5,6 +5,7 @@ import "hardhat/console.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 //import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol
+// import ./HomeContract.sol;
 
 contract StakingPool {
 
@@ -25,6 +26,11 @@ contract StakingPool {
 
   constructor() {
     // what should we do on deploy?
+    /*
+       Network: Kovan
+       Aggregator: ETH/USD
+       Address: 0x9326BFA02ADD2366b30bacB125260Af641031331
+    */
     priceFeed = AggregatorV3Interface(0x9326BFA02ADD2366b30bacB125260Af641031331); //Kovan Testnet ETH/USD Smart Contract Data Feed
   }
 
@@ -54,11 +60,39 @@ contract StakingPool {
       //updateIncomeIndex();
   }
 
-  function buyHome(address memory homeNFT, uint memory amount) public {
+  function sellHomeToContract(uint256 deedId, uint askingPriceUSD) public {
+      require(IERC721(propertydeed_address).ownerOf(deedId) == msg.sender, "You are not the owner of that home!");
+      //fairSalePrice = Query ZillowAPI via Chainlink Oracle using deedId Info
+      //require(fairSalePrice >= amount, "Amount requested is higher than estimate");
+      (uint80 roundID, int ethPriceInUSD, uint startedAt, uint timestamp, uint80 answeredInRound) = priceFeed.latestRoundData();
+      require(totalLiquidity-totalBorrowed >= askingPrice/ethPriceInUSD, "Sorry! Not enough funds to purchase home!")
+      IERC721(propertydeed_address).safeTransferFrom(msg.sender, address(this), deedId)
+      payable(msg.sender).transfer(amount/ethPriceInUSD)
+      totalBorrowed += amount/ethPriceInUSD;
+      //HomeContract(Walt_address).addProperty(deedId, vesting_period, monthlyRent);
+  }
+
+  //function addRentToPool(uint principle, uint interest) public {
+      //totalBorrowed -= principle;
+  
+  }
+
+  //function closeOutHome() public {
+  //    totalBorrowed -= 380,000
+  //}
+  //function addAppreciationToPool() public {
+  // 
+  //}
+
+
+      //TODO setup Walt's 
+      //TODO calculate monthly rent for 
+
+
       //require(homeNFT == 0x00000000000000000000000000000000000000000000, "Not a homeNFT") //need to update with the smart contract address for the homeNFTs
       //require(amount < totalLiquidity - totalBorrowed, "Not enough funds to purchase home")
       //IERC721(token).transferFrom(msg.sender, address(this), homeId
-  }
+  
 
 //  function updateIncomeIndex() public {
 //      utilizationRate = totalBorrowed/totalLiquidity;
