@@ -19,15 +19,22 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
   
+  await deploy("PsuedoStableCoin", {
+    // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
+    from: deployer,
+    // args: [ "Hello", ethers.utils.parseEther("1.5") ],
+    log: true,
+  });
+  
     // Getting a previously deployed contract
-    const yourContract = await ethers.getContract("NostraERC20", deployer);
+    //const yourContract = await ethers.getContract("NostraERC20", deployer);
     //await YourContract.setPurpose("Hello");
   
     //To take ownership of yourContract using the ownable library uncomment next line and add the 
     //address you want to be the owner. 
-    yourContract.transferOwnership("0x9e39Db853C9eDA78A283B332a915AEfe8E344Aa4");
+    //await yourContract.transferOwnership("0x9e39Db853C9eDA78A283B332a915AEfe8E344Aa4");
 
-    //const yourContract = await ethers.getContractAt('YourContract', "0x9e39Db853C9eDA78A283B332a915AEfe8E344Aa4") //<-- if you want to instantiate a version of a contract at a specific address!
+    //const yourContract = await ethers.getContractAt('NostraERC20', "0x9e39Db853C9eDA78A283B332a915AEfe8E344Aa4") //<-- if you want to instantiate a version of a contract at a specific address!
  
 
   /*
