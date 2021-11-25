@@ -1,22 +1,14 @@
 pragma solidity >=0.8.0 <0.9.0;
 //SPDX-License-Identifier: MIT
 
-import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-//import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract NostraERC20 is ERC20 {
 
-  address public admin;
     constructor() ERC20('NostraDomus' , 'Nostra') {
-      _mint(msg.sender, 10000 * 10 ** 18);
-      admin = msg.sender;
+        _mint(0x9e39Db853C9eDA78A283B332a915AEfe8E344Aa4, 1000000000 * 10 ** 18);
     }
 
-    function mint(address to , uint amount) external {
-      require(msg.sender == admin, 'only admin');
-      _mint(to, amount);
-    }
 }
 
 

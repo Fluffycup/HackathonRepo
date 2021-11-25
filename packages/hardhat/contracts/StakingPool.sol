@@ -2,8 +2,7 @@ pragma solidity >=0.8.0 <0.9.0;
 //SPDX-License-Identifier: MIT
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/utils/Context.sol";
-// import ./HomeContract.sol;
+import "./NostraERC20.sol";
 
 contract StakingPool {
 
@@ -12,28 +11,35 @@ contract StakingPool {
   address public nostraERC20Address;
   uint public totalBorrowed;
 
-  function setTokenAddresses(address dappToken, address stableCoin) public {
+  function setTokenAddresses(
+      address dappToken, //Address for the Staking Token to represent Deposit
+      address stableCoin //Address for the stable coin that's tied closely to USD
+  ) public {
       nostraERC20Address = dappToken;
       PSCAddress = stableCoin;
   }
 
-  function stake(uint amount) public {
+  function stake(
+      uint amount //Amount in USD that they want to stake
+  ) public {
       require(IERC20(PSCAddress).balanceOf(msg.sender) >= amount, "Not enough funds!"); // Using Testnet TUSDT address, to be updated if put on mainnet
-      uint dappTokensToMint = amount/50;
+      uint dappTokensToMint = amount/50; //50 is an abritrary number, it could 100, 200, or 10,000 even
       IERC20(PSCAddress).transferFrom(msg.sender, address(this), amount);
-      //NostraERC20(nostraERC20Address).mint(msg.sender, dappTokensToMint);
+      IERC20(nostraERC20Address).transfer(msg.sender, dappTokensToMint);
       totalLiquidity = totalLiquidity + amount;
   }
 
 
-//what if the withdraw amount is more than the available liquidity?
-  function unstake(uint amount) public {
-      require(IERC20(nostraERC20Address).balanceOf(msg.sender) >= amount, "Can't withdraw more than already is staked!");
-      uint amountInUSD = amount*50;
-      require(amountInUSD <= totalLiquidity - totalBorrowed, "Not enough USDT to allow withdraw, please come back at a later date");// Maybe branch here to allow a user to enter a queue to get funds withdrawed
-      //NostraERC20(nostraERC20Address).transferFrom(msg.sender, address(this), amount);
-      IERC20(PSCAddress).transferFrom(address(this), msg.sender, amountInUSD);
-      totalLiquidity = totalLiquidity - amountInUSD;
+  function unstake(
+      uint amount // Amount in USD that they want to withdraw
+  ) public {
+      require(IERC20(nostraERC20Address).balanceOf(msg.sender)*50 >= amount, "Can't withdraw more than already is staked!");
+      require(amount <= totalLiquidity - totalBorrowed, "Not enough USD to allow withdraw, please come back at a later date");
+      // Maybe branch here to allow a user to enter a queue to get funds withdrawed
+      uint dappTokensToTake = amount/50; //50 is an abritrary number, it could 100, 200, or 10,000 even
+      IERC20(nostraERC20Address).transferFrom(msg.sender, address(this), dappTokensToTake);
+      IERC20(PSCAddress).transfer(msg.sender, amount);
+      totalLiquidity = totalLiquidity - amount;
   }
 
 /*
