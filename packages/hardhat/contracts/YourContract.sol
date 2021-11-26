@@ -18,25 +18,24 @@ contract YourContract is Ownable {
 
       // TODO add functions to set deed NFT token address
       // TODO add function to set rent payment contract address
+
+      // add 
     }
 
     function showEquity(address _addr, uint256 _deedId) public view returns (uint256) {
       return equityMap[_deedId][_addr];
     }
 
-    function mintEquity(uint256 _deedId, uint256 _mortgageTermYears) public {
+    function mintEquity(uint256 _deedId, uint256 _mortgageTermYears) onlyOwner public {
       // require that the user holds the erc721 deed token with token id = _deedId
       // check out OwnerOf or isOwnerOf from erc721 contract 
-      deedOwner = msg.sender;
-      equityMap[_deedId][msg.sender] = _mortgageTermYears * 20;
+      equityMap[_deedId][address(this)] = _mortgageTermYears * 12; // todo change deedOwner instances
     }
 
-    function rewardRenter(uint256 _deedId, address _addr) public {
-      if (msg.sender == rentPaymentContract) {
-        require(equityMap[_deedId][deedOwner] >= 1);
-        equityMap[_deedId][deedOwner] -= 1;
-        equityMap[_deedId][_addr] += 1;
-      }
+    function rewardRenter(uint256 _deedId, address _addr) onlyOwner public {
+      require(equityMap[_deedId][address(this)] >= 1);
+      equityMap[_deedId][address(this)] -= 1;
+      equityMap[_deedId][_addr] += 1;
     }
   
     function allocateEquity(uint256 _deedId, address _addr, uint256 _equityAmount) public {
@@ -44,10 +43,9 @@ contract YourContract is Ownable {
       require(equityMap[_deedId][msg.sender] >= _equityAmount);
       equityMap[_deedId][msg.sender] -= _equityAmount;
       equityMap[_deedId][_addr] += _equityAmount;
-
     }
 
-    function buyoutEquityHolders(uint256 _deedId) public {
+    function buyoutEquityHolders(uint256 _deedId) onlyOwner public {
       require(msg.sender == deedOwner);
       // can't buy out people during the vesting period -> will need to check
       // the block number? 5 10 or 15 years from now
