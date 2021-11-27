@@ -9,30 +9,35 @@ contract HomeContract {
     uint monthlyRent;
     bool occupied;
     address currentOccupant;
+    uint256 homeDeedID;
   }
 
   mapping (uint256 => Home) public properties;
   mapping (string => uint256) public rightsToOccupyIDs;
   address private rightsToOccupyAddress;
+  address private equityContract;
 
- constructor(address _rightsToOccupyAddress) {
+ constructor(address _rightsToOccupyAddress, address _equityContract) {
     rightsToOccupyAddress = _rightsToOccupyAddress;
+    equityContract = _equityContract;
   } 
 
   function addProperty(address _occupant, uint _homeDeedTokenID, uint _vestingPeriod, uint _monthlyRent, string memory _address) public {
     // tokenURI is metadata so makes sense to make it _homeDeedTokenID
     string tokenUri = uint2str(_homeDeedTokenId);
-    bytes memory payload = abi.encodeWithSignature("awardItem(adress, string)", _occupant, tokenUri);
+    bytes memory payload = abi.encodeWithSignature("awardItem(address, string)", _occupant, tokenUri);
     // decode function call results
     (bool sucess, bytes memory result) = rightsToOccupyAddress.call(payload);
     uint256 newTokenId = abi.decode(result, (uint256));
 
-    Home newHome = Home(now, _vestingPeriod, _monthlyRent, true, _occupant); // need to change now
+    Home newHome = Home(now, _vestingPeriod, _monthlyRent, true, _occupant, _homeDeedTokenID); // need to change now
     // map home address to new tokenID
     // then map tokenID to Home object
     rightsToOccupyIDs[_address] = newTokenId;
     properties[newTokenId] = newHome;
-    // createEquityTokens  
+    // createEquityTokens
+    bytes memory payload = abi.encodeWithSignature("mintEquity(uint256, uint256)", _homeDeedTokenID, _vestingPeriod);
+    equityContract.call(payload);
   }
 
   function claimRightsToOccupyToken(address _claimer, uint256 _occupyTokenID) public {
@@ -43,25 +48,25 @@ contract HomeContract {
   function transferRightsToOccupyToken(address _to, address _from, uint256 _rightsToOccupyID) public {
     IERC721 rtoContract = IERC721(_rightsToOccupyAddress);
     rtoContract.safeTransferFrom(_from, _to, _rightsToOccupyID);
+    properties[_rightsToOccupyID].currentOccupant = _to;
+    properties[_rightsToOccupyID].occupied = true;
   }
 
   function payRent(address _occupant, string memory _homeAddress) payable {
-    // TODO: send funds to investment pool contract.
+    // send funds to investment pool contract.
     uint256 homeTokenID = rightsToOccupyIDs[_homeAddress];
     Home home = properties[homeTokenID];
     uint monthlyRent = home.monthlyRent;
+    uint homeDeedID = home.homeDeedID;
     require(IERC20(PSCAddress).balanceOf(msg.sender) >= monthlyRent, "Not enough funds");
-    IERC20(PSCAddress).transferFrom(_occupant, liquidityPool, monthlyRent);
-    // TODO: transfer equity token to occupant
-
+    IERC20(PSCAddress).transferFrom(_occupant, liquidityPool, monthlyRent); // I think this needs to be switched to a function call from stake contract
+    // transfer equity token to occupant
+    bytes memory payload = abi.encodeWithSignature("rewardRenter(uint256, address)", homeDeedID, _occupant);
+    equityContract.call(payload);
   } 
 
-  function getEquity(address occupant) public {
-    // TODO: return current equity
-  }
-
   function checkIfVestingPeriodOver(Home _home) private returns (bool) {
-    return now >= _home.startDate + _home.vestingPeriod;
+    return now >= _home.startDate + _home.vestingPeriod; //This doesn't work
   }
 
   // helper function
