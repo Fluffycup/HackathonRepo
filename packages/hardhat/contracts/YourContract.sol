@@ -8,12 +8,12 @@ contract equityContract is Ownable {
     mapping(uint256 => mapping(address => uint256)) equityMap;
     mapping(uint256 => address[]) deedRegistry;
     mapping(uint256 => uint256) equityMinted;
+    mapping(uint256 => uint256) housePrices;
     address treasuryHolding;
     IERC20 private _PSC;
 
         
     constructor(IERC20 PSC) {
-      // TODO Set owner? Check openzeppelin specs  
       _PSC = PSC;
     }
 
@@ -36,26 +36,30 @@ contract equityContract is Ownable {
     }
   
     function allocateEquity(uint256 _deedId, address _addr, uint256 _equityAmount) public {
-      require(equityMap[_deedId][address(this)] >= _equityAmount, "Not enough equity to transfer.");
-      equityMap[_deedId][address(this)] -= _equityAmount;
+      require(equityMap[_deedId][treasuryHolding] >= _equityAmount, "Not enough equity to transfer.");
+      equityMap[_deedId][treasuryHolding] -= _equityAmount;
       equityMap[_deedId][_addr] += _equityAmount;
       deedRegistry[_deedId].push(_addr);
+    }
+
+    function setHousePrice(uint256 _deedId, uint256 _housePrice) onlyOwner public {
+      housePrices[_deedId] = _housePrice;
     }
 
     function buyoutEquityHolders(uint256 _deedId) public {
       // ensure sender has enough funds
       // TODO what shoud the value be? Need house price
-      uint256 housePrice = 600_000;
+      uint256 housePrice = housePrices[_deedId];
       require(_PSC.balanceOf(msg.sender) >= housePrice);
       for (uint i = 0; i < deedRegistry[_deedId].length; i++) {
         // Send each equity holder amount = equity / total equity * house price
         address currentAddr = deedRegistry[_deedId][i];
         uint256 amountToSend = equityMap[_deedId][currentAddr] / equityMinted[_deedId] * housePrice;
         _PSC.transferFrom(msg.sender, deedRegistry[_deedId][i], amountToSend);
-        
-        // delete their equity
+        // reduce their equity to 0
         equityMap[_deedId][deedRegistry[_deedId][i]] = 0;
-
       }
+      // set buyout address equity to 100%
+      equityMap[_deedId][msg.sender] = equityMinted[_deedId];
     }
 }
