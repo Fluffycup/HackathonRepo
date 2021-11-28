@@ -31,9 +31,14 @@ contract equityContract {
       treasuryHolding = address(this);
     }
 
+    function payRent(uint256 _deedId, uint256 _rentAmount) public {
+      IERC20(PSCAddress).transferFrom(msg.sender, treasuryHolding, _rentAmount);
+      rewardRenter(_deedId, msg.sender);
+    }
+
     function rewardRenter(uint256 _deedId, address _addr) public {
-      require(equityMap[_deedId][address(this)] >= 1, "Not enough equity to allocate.");
-      equityMap[_deedId][address(this)] -= 1;
+      require(equityMap[_deedId][treasuryHolding] >= 1, "Not enough equity to allocate.");
+      equityMap[_deedId][treasuryHolding] -= 1;
       equityMap[_deedId][_addr] += 1;
       deedRegistry[_deedId].push(_addr);
     }
