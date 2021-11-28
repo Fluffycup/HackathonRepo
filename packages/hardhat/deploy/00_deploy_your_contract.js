@@ -20,12 +20,12 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
 
-  // await deploy("HomeContract", {
-  //   // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
-  //   from: deployer,
-  //   // args: [ "Hello", ethers.utils.parseEther("1.5") ],
-  //   log: true,
-  // });
+  await deploy("HomeContract", {
+    // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
+    from: deployer,
+    args: [ "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318", "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318" ],
+    log: true,
+  });
   
     // Getting a previously deployed contract
     //const yourContract = await ethers.getContract("NostraERC20", deployer);
