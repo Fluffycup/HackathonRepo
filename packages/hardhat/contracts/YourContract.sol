@@ -17,7 +17,7 @@ contract equityContract {
 
     }
 
-    function setTokenAddresses(address stableCoin) public {
+    function setPSCTokenAddresses(address stableCoin) public {
       PSCAddress = stableCoin;
   }
 
