@@ -15,6 +15,17 @@ contract NostraDomus is ERC20, Ownable {
     function mint(address to , uint amount) external {
       require(msg.sender == admin, 'only admin');
       _mint(to, amount);
+
+    }
+    function balanceOf(address _user) public{
+            uint256 rawBalance = balances[_user];
+	    if (rawBalance ==0) {
+        	return 0;
+             }
+             uint256 startLevel = compoundInterestFactor[_user];
+     	     uint256 currentLevel = getInterestRate().getCurrentCompoundingLevel();
+             return _rawBalance.mul(currentLevel).div(startLevel);
+
     }
 }
 
