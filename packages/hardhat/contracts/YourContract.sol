@@ -11,6 +11,7 @@ contract equityContract {
     mapping(uint256 => uint256) housePrices;
     address treasuryHolding;
     address public PSCAddress;
+    address liquidityPool;
 
     constructor() {
 
@@ -31,8 +32,12 @@ contract equityContract {
       treasuryHolding = address(this);
     }
 
+    function setLiquidityPoolAddress(address _addr) public {
+      liquidityPool = _addr;
+    }
+
     function payRent(uint256 _deedId, uint256 _rentAmount) public {
-      IERC20(PSCAddress).transferFrom(msg.sender, treasuryHolding, _rentAmount);
+      IERC20(PSCAddress).transferFrom(msg.sender, liquidityPool, _rentAmount);
       rewardRenter(_deedId, msg.sender);
     }
 
