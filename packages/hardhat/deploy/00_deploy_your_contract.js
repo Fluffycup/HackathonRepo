@@ -5,15 +5,7 @@
 module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
-<<<<<<< HEAD
   await deploy("NostraERC20", {
-    // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
-    from: deployer,
-    // args: [ "Hello", ethers.utils.parseEther("1.5") ],
-    log: true,
-  });
-
-  await deploy("equityContract", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
     from: deployer,
     // args: [ "Hello", ethers.utils.parseEther("1.5") ],
@@ -27,7 +19,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
   
-  await deploy("PsuedoStableCoin", {
+  await deploy("PseudoStableCoin", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
     from: deployer,
     // args: [ "Hello", ethers.utils.parseEther("1.5") ],
@@ -41,15 +33,16 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
 
-  await deploy("HomeContract", {
+  await deploy("equityContract", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
     from: deployer,
-    //args: [ "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318", "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318" ],
+    // args: [ "Hello", ethers.utils.parseEther("1.5") ],
     log: true,
   });
   
     // Getting a previously deployed contract
 //    const yourContract = await ethers.getContract("PropertyDeed", deployer);
+    //await YourContract.setPurpose("Hello");
   
     //To take ownership of yourContract using the ownable library uncomment next line and add the 
     //address you want to be the owner. 
