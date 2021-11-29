@@ -19,7 +19,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
   
-  await deploy("PsuedoStableCoin", {
+  await deploy("PseudoStableCoin", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
     from: deployer,
     // args: [ "Hello", ethers.utils.parseEther("1.5") ],
@@ -27,6 +27,13 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   });
 
   await deploy("PropertyDeed", {
+    // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
+    from: deployer,
+    // args: [ "Hello", ethers.utils.parseEther("1.5") ],
+    log: true,
+  });
+
+  await deploy("equityContract", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
     from: deployer,
     // args: [ "Hello", ethers.utils.parseEther("1.5") ],
