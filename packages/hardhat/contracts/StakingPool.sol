@@ -2,21 +2,39 @@ pragma solidity >=0.8.0 <0.9.0;
 //SPDX-License-Identifier: MIT
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "./NostraERC20.sol";
+import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
 
-contract StakingPool {
+contract StakingPool is ChainlinkClient, ERC721Holder {
+  using Chainlink for Chainlink.Request;
 
+  uint256 public avm;
+  address public oracle;
+  bytes32 public jobId;
+  uint256 public fee;
   uint public totalLiquidity;
   address public PSCAddress;
   address public nostraERC20Address;
+  address public DeedAddress;
   uint public totalBorrowed;
+
+  constructor() {
+      setPublicChainlinkToken();
+      oracle = 0xc57B33452b4F7BB189bB5AfaE9cc4aBa1f7a4FD8;
+      jobId = "d5270d1c311941d0b08bead21fea7747";
+      fee = 0.1 * 10 ** 18;
+  }
 
   function setTokenAddresses(
       address dappToken, //Address for the Staking Token to represent Deposit
-      address stableCoin //Address for the stable coin that's tied closely to USD
+      address stableCoin, //Address for the stable coin that's tied closely to USD
+      address deedAddress
   ) public {
       nostraERC20Address = dappToken;
       PSCAddress = stableCoin;
+      DeedAddress = deedAddress;
   }
 
   function stake(
@@ -42,19 +60,46 @@ contract StakingPool {
       totalLiquidity = totalLiquidity - amount;
   }
 
-/*
+  function requestAVMData() public returns (bytes32 requestId)
+    {
+        Chainlink.Request memory request = buildChainlinkRequest(jobId, address(this), this.fulfill.selector);
+
+        request.add("get", "https://min-api.cryptocompare.com/data/pricemultifull?fsyms=ETH&tsyms=USD");
+        
+        request.add("path", "RAW.ETH.USD.VOLUME24HOUR");
+        
+        // Multiply the result by 1000000000000000000 to remove decimals
+        int timesAmount = 10**18;
+        request.addInt("times", timesAmount);
+        // Set the URL to perform the GET request on
+        //request.add("property_id", "100000125583");
+        //request.add("street", "broadway");
+        //request.add("city", "New York");
+        //request.add("state", "NY");
+        //request.add("zip", "12345");
+
+        // Sends the request
+        return sendChainlinkRequestTo(oracle, request, fee);
+    }
+
+    function fulfill(bytes32 _requestId, uint256 _avm) public recordChainlinkFulfillment(_requestId)
+    {
+        avm = _avm;
+    }
+
+
   function sellHomeToContract(uint256 deedId, uint askingPriceUSD) public {
-      require(IERC721(propertydeed_address).ownerOf(deedId) == msg.sender, "You are not the owner of that home!");
-      //fairSalePrice = Query ZillowAPI via Chainlink Oracle using deedId Info
-      //require(fairSalePrice >= amount, "Amount requested is higher than estimate");
-      (uint80 roundID, int ethPriceInUSD, uint startedAt, uint timestamp, uint80 answeredInRound) = priceFeed.latestRoundData();
-      require(totalLiquidity-totalBorrowed >= askingPrice/ethPriceInUSD, "Sorry! Not enough funds to purchase home!")
-      IERC721(propertydeed_address).safeTransferFrom(msg.sender, address(this), deedId)
-      payable(msg.sender).transfer(amount/ethPriceInUSD)
-      totalBorrowed += amount/ethPriceInUSD;
+      require(IERC721(DeedAddress).ownerOf(deedId) == msg.sender, "You are not the owner of that home!");
+      //require(avm != 0, "still awaiting API valuation of home response");
+      //require(avm  >= askingPriceUSD, "Amount requested is higher than estimate");
+      require(totalLiquidity-totalBorrowed >= askingPriceUSD, "Sorry! Not enough funds to purchase home!");
+      IERC721(DeedAddress).safeTransferFrom(msg.sender, address(this), deedId);
+      IERC20(PSCAddress).transfer(msg.sender, askingPriceUSD);
+      totalBorrowed += askingPriceUSD;
+      avm = 0;
       //HomeContract(Walt_address).addProperty(deedId, vesting_period, monthlyRent);
   }
-*/
+
   //function addRentToPool(uint principle, uint interest) public {
       //totalBorrowed -= principle;
       //This will call the DappToken contract and just update the amount of DappTokens each person has in one fell swoop using their addresses stored;
